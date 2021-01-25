@@ -78,7 +78,7 @@
 
 #back-link-container{
     display: block;
-    width: 500px;
+    max-width: 500px;
     margin: 30px auto 0;
 }
 
@@ -91,4 +91,15 @@
 
 #back-link:hover{
     text-decoration: none;
+}
+
+.delete-form{
+    display: inline-block;
+}
+
+/* MOBILE */
+@media(max-width: 480px){
+    #home-link{
+        display:none;
+    }
 }

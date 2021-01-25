@@ -1,78 +1,120 @@
 <?php
 
-    session_status();
+session_start();
 
-    include_once("connection.php");
-    include_once("url.php");
+include_once("connection.php");
+include_once("url.php");
 
-    $data = $_POST;
+$data = $_POST;
 
-    if(!empty($data)){ //MODIFICAÇÕES NO BANCO
+//MODIFICAÇÕES NO BANCO
+if(!empty($data)){
 
-        if($data["type"] === "create"){ //CRIAR CONTATO
+    if($data["type"] === "create"){
 
-            $name = $data["name"];
-            $phone = $data["phone"];
-            $observations = $data["observations"];
+        $name = $data["name"];
+        $phone = $data["phone"];
+        $observations = $data["observations"];
 
-            $query = "INSERT INTO contacts (name, phone, obeservations) VALUES (:name, :phone, :observations)";
+        $query = "INSERT INTO contacts (name, phone, obeservations) VALUES (:name, :phone, :observations)";
 
-            $stmt = $conn->prepare($query);
+        $stmt = $conn->prepare($query);
 
-            $stmt->bindParam(":name", $name);
-            $stmt->bindParam(":phone", $phone);
-            $stmt->bindParam(":observations", $observations);
+        $stmt->bindParam(":name", $name);
+        $stmt->bindParam(":phone", $phone);
+        $stmt->bindParam(":observations", $observations);
 
-            try{
+        try{
 
-                $stmt->execute();
-                $_SESSION["msg"] = "CONTATO CRIADO COM SUCESSO";                
-        
-            } catch(PDOException $e){
-                //erro na conexão
-                $error = $e->getMessage();
-                echo "Error: $error"; 
-            }
-
-        }
-
-        //REDIRECT HOME
-        header("Location:" . $BASE_URL . "../index.php");
-
-    }else{ //SELEÇÃO DE DADOS
-
-        $id;
-
-        if(!empty($_GET)){
-            $id = $_GET["id"];
-        }
-    
-        if(!empty($id)){
-    
-            $query = "SELECT * FROM contacts WHERE id = :id";
-    
-            $stmt = $conn->prepare($query);
-            $stmt->bindParam(":id", $id);
-    
             $stmt->execute();
+            $_SESSION["msg"] = "CONTATO CRIADO COM SUCESSO";                
     
-            $contact = $stmt->fetch();
-    
-        }else{
-            $contacts = [];
-    
-            $query = "SELECT * FROM contacts";
-    
-            $stmt = $conn->prepare($query);
-    
-            $stmt->execute();
-    
-            $contacts = $stmt->fetchAll();
+        } catch(PDOException $e){
+            //erro na conexão
+            $error = $e->getMessage();
+            echo "Error: $error"; 
         }
+
+    } else if($data["type"] === "edit") {
+
+        $name = $data["name"];
+        $phone = $data["phone"];
+        $observations = $data["observations"];
+        $id = $data["id"];
+    
+        $query = "UPDATE contacts 
+                    SET name = :name, phone = :phone, obeservations = :observations 
+                    WHERE id = :id";
+    
+        $stmt = $conn->prepare($query);
+    
+        $stmt->bindParam(":name", $name);
+        $stmt->bindParam(":phone", $phone);
+        $stmt->bindParam(":observations", $observations);
+        $stmt->bindParam(":id", $id);
     
         
+    } else if($data["type"] == "delete"){
+
+        $id = $data["id"];
+
+        $query = "DELETE FROM contacts WHERE id = :id";
+
+        $stmt = $conn->prepare($query);
+
+        $stmt->bindParam(":id", $id);
+
+        try {
+    
+            $stmt->execute();
+            $_SESSION["msg"] = "Contato removido com sucesso!";
+        
+        } catch(PDOException $e) {
+            // erro na conexão
+            $error = $e->getMessage();
+            echo "Erro: $error";
+        }
 
     }
+    
 
-    //FECHAR CONEXÃO
-    $conn = null;
+    //REDIRECT HOME
+    header("Location:" . $BASE_URL . "../index.php");   
+
+}else{ //SELEÇÃO DE DADOS
+
+    $id;
+
+    if(!empty($_GET)){
+        $id = $_GET["id"];
+    }
+
+    if(!empty($id)){
+
+        $query = "SELECT * FROM contacts WHERE id = :id";
+
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(":id", $id);
+
+        $stmt->execute();
+
+        $contact = $stmt->fetch();
+
+    }else{
+        $contacts = [];
+
+        $query = "SELECT * FROM contacts";
+
+        $stmt = $conn->prepare($query);
+
+        $stmt->execute();
+
+        $contacts = $stmt->fetchAll();
+    }
+
+    
+
+}
+
+//FECHAR CONEXÃO
+$conn = null;
