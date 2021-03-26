@@ -10,6 +10,19 @@ require __DIR__ . "/source/autoload.php";
  */
 fullStackPHPClassSession("superclass", __LINE__);
 
+$client = new \Source\App\User("Pedro", "Silva");
+// $account = new \Source\Bank\Account(
+//     "1600",
+//     "22421",
+//     $client,
+//     "10000"
+// );
+
+var_dump(
+    $client,
+    // $account
+);
+
 
 /*
  * [ especialização ] É uma classe filha que implementa a superclasse e se especializa
@@ -17,9 +30,43 @@ fullStackPHPClassSession("superclass", __LINE__);
  */
 fullStackPHPClassSession("especialização.a", __LINE__);
 
+$saving = new \Source\Bank\AccountSaving(
+    "1604",
+    "222344",
+    $client,
+    "0",
+);
 
+var_dump($saving);
+
+$saving->deposit(1000);
+$saving->withdrawal(1500);
+$saving->withdrawal(1000);
+$saving->withdrawal(6);
+
+$saving->extract();
 /*
  * [ especialização ] É uma classe filha que implementa a superclass e se especializa
  * com suas prórpias rotinas
  */
 fullStackPHPClassSession("especialização.b", __LINE__);
+
+$current = new \Source\Bank\AccountCurrent(
+    "1604",
+    "222344",
+    $client,
+    "1000",
+    "1000"
+);
+
+var_dump($current);
+
+$current->deposit(1000);
+
+$current->withdrawal(2000);
+
+$current->withdrawal(500);
+
+
+
+$current->extract();
